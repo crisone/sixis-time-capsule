@@ -95,7 +95,7 @@ $ echo $?
 
 如果不是Ctrl + C，而是只给执行shell脚本的bash进程发送 SIGINT，则会发生：
 - wait 被打断，触发 onSigint函数，然后继续执行接下来的逻辑
-- 由于 ping 程序依然或者说，if判断下面的 kill 命令会被执行，ping 程序收到 SIGINT 信号
+- 由于 ping 程序依然活着，if判断下面的 kill 命令会被执行，给 ping 进程发送SIGINT 信号
 - 第二个 wait 在 ping 程序退出之后结束，脚本结束
 
 所以按照`test.sh`的写法，似乎只给 Bash进程发 SIGINT 信号，也是可以实现正常退出的，那么为什么在我最初提到的问题中，会失败呢。这与脚本最后使用的管道命令有关
