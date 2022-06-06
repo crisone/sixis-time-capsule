@@ -123,7 +123,7 @@ kill -s SIGINT -- -$gpid
 
 但在我的问题中，这样做有点棘手，因为 shell 脚本是在 python 程序的子线程里执行的，事实上，bash进程和python进程属于同一个进程组。我当然不想让 python 进程也收到信号。
 
-我最后解决问题的方法很简单，不过也非常局限于我当前的Case，即通过 `pkill` 发送信号给我启动的`bash test.sh`进程的直接子线程。
+我最后解决问题的方法很简单，不过也非常局限于我当前的问题，即通过 `pkill` 发送信号给我启动的`bash test.sh`进程的直接子线程。
 ```python
 # start bash process
 p = subprocess.Popen(["bash", "test.sh"])
@@ -135,8 +135,9 @@ subprocess.call("pkill --signal SIGINT -P {}".format(p.pid), shell=True)
 p.communicate()
 ```
 
-要注意的是，此处在python中启动 `test.sh` 必须用列表命令的方式，而不能用字符串加参数  `shell=True`，否则 python 又会再起一个 线程作为`bash test.sh` 的父线程，这样我们拿到的 pid 的会又多了一层进程层级关系，这个方法又不work了。
+要注意的是，此处在python中启动 `test.sh` 必须用列表命令的方式，而不能用字符串加参数`shell=True`，否则 python 又会再起一个 线程作为`bash test.sh` 的父线程，这样我们拿到的 pid 的会又多了一层进程层级关系，这个方法又不work了。
 
+其实，改动`./test.sh`让它能够独立妥善处理 SIGINT 才是最优雅和最不容易埋坑的做法。
 
 ## 额外提一点，关于孤儿进程
 问：如果父进程退出了，而子进程还正常运行会怎么样呢？
